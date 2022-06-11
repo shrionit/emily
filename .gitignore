@@ -1,0 +1,7 @@
+assets
+output
+.settings
+.vscode
+*.bat
+.cproject
+.project
