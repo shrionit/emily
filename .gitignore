@@ -5,6 +5,7 @@ output
 *.bat
 .cproject
 .project
+.externalToolBuilders
 
 # Prerequisites
 *.d
