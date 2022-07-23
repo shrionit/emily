@@ -1,6 +1,3 @@
-// https://imx.to/g/jx4t
-// http://nymphs.love/t_Nicolette
-
 #include <iostream>
 #include <functional>
 #include <iterator>
