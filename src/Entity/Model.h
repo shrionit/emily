@@ -32,14 +32,12 @@ public:
     bool gammaCorrection;
     Model():gammaCorrection(false){}
     // constructor, expects a filepath to a 3D model.
-    Model(string const &path, bool gamma = false) : gammaCorrection(gamma)
-    {
+    Model(string const &path, bool gamma = false) : gammaCorrection(gamma) {
         loadModel(path);
     }
 
     // draws the model, and thus all its meshes
-    void Draw(Shader &shader)
-    {
+    void Draw(Shader &shader) {
         for(unsigned int i = 0; i < meshes.size(); i++)
             meshes[i].Draw(shader);
     }
@@ -187,6 +185,7 @@ private:
             if(!skip)
             {   // if texture hasn't been loaded already, load it
                 Texture texture;
+                cout << str.C_Str() << " - " << directory << endl;
                 texture.ID = textureFromFile(str.C_Str(), this->directory);
                 texture.type = typeName;
                 texture.path = str.C_Str();

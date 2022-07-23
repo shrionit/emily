@@ -34,7 +34,6 @@ void EventManager::ProcessEvents(GLFWwindow* window){
 }
 
 void EventManager::handleKeyEvents(GLFWwindow* window, int key, int scancode, int action, int mods){
-	std::cout << "KEY = " << key << std::endl;
 	KEYS[key] = action != GLFW_RELEASE;
 }
 

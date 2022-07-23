@@ -8,11 +8,12 @@
 #ifndef ENTITY_H
 #define ENTITY_H
 
-#include "glad\glad.h"
 #include "glm\glm.hpp"
 #include "glm\vec4.hpp"
-#include "..\Utils\GMath.h"
+#include <string>
 #include "..\Shader\Shader.h"
+#include "..\Utils\GMath.h"
+#include "..\Utils\UUID.h"
 #include "..\Loader\TextureLoader.h"
 #include "..\Loader\VAO.h"
 #include "Model.h"
@@ -23,7 +24,7 @@ namespace EMILY {
 
 	class Entity {
 		public:
-			Entity(){}
+			Entity() : ID(uuid::v4()){}
 			Entity(const char* modelPath, glm::vec3 position = glm::vec3(0), glm::vec3 rotation = glm::vec3(0), glm::vec3 scale = glm::vec3(1));
 			Entity(VAO &vao, Texture& texture);
 			Entity(VAO &vao, Texture& texture, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale);
@@ -47,17 +48,30 @@ namespace EMILY {
 			bool isVisible() const;
 			void setVisible(bool visible);
 			GLuint getDrawMode() const;
-			void setDrawMode(GLuint drawMode = GL_FILL);
+			void setDrawMode(GLuint dm);
 			const Model& getModel() const;
 			void setModel(const Model &model);
+			const std::string& getID(){
+				return ID;
+			}
+
+			void setLabel(std::string newLabel="");
+
+			std::string getLabel(){
+				return label;
+			}
 
 			~Entity();
 		private:
+			static GLuint count;
+			std::string ID;
+			std::string label;
 			VAO vao;
 			Model model;
 			bool hasModel = false;
+			bool hasCustomTexture = false;
 			bool visible = true;
-			GLuint drawMode = GL_FILL;
+			GLuint drawMode;
 			glm::vec3 position;
 			glm::vec3 rotation;
 			glm::vec3 scale;

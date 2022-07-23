@@ -1,22 +1,38 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 #include <iostream>
+#include <string>
+#include "..\utils\UUID.h"
 #include <glm\glm.hpp>
 #include <glm\vec3.hpp>
 #include <glm\gtc\matrix_transform.hpp>
 #include "GLFW\glfw3.h"
 #include "..\Utils\EventManager.h"
+
+using namespace std;
 #pragma once
 class Camera {
     public:
+
         glm::vec3 cameraPos;
         glm::vec3 cameraTarget;
         glm::vec3 cameraDirection;
         glm::vec3 cameraUp;
         glm::vec3 cameraRight;
         glm::vec3 cameraFront;
+        float maxFOV = 135;
+        float minFOV = 35;
         float deltaTime;
         float lastFrame;
+
+        const std::string& getID(){
+        	return ID;
+        }
+
+        const std::string getLabel(){
+        	return label;
+        }
+
         Camera(){
             defaultInit();
             updateCameraVectors();
@@ -35,86 +51,77 @@ class Camera {
         void handleMovement(GLFWwindow* window){
         	if(EventManager::IsMouseKeyPressed(GLFW_MOUSE_BUTTON_MIDDLE)) handleCameraDirection(window);
             handleCameraZoom(window);
-            float currentFrame = static_cast<float>(glfwGetTime());
+//            float currentFrame = static_cast<float>(glfwGetTime());
+            float currentFrame = glfwGetTime();
             deltaTime = currentFrame - lastFrame;
             lastFrame = currentFrame;
             const float cameraSpeed = SPEED * deltaTime; // adjust accordingly
-            if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+            if (EventManager::IsPressed(GLFW_KEY_W))
                 cameraPos += cameraSpeed * cameraFront;
-            if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+            if (EventManager::IsPressed(GLFW_KEY_S))
                 cameraPos -= cameraSpeed * cameraFront;
-            if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-            	cameraPos += cameraRight * cameraSpeed;
-            if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+            if (EventManager::IsPressed(GLFW_KEY_A))
             	cameraPos -= cameraRight * cameraSpeed;
-            if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-				cameraPos -= cameraUp * cameraSpeed;
-            if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
+            if (EventManager::IsPressed(GLFW_KEY_D))
+            	cameraPos += cameraRight * cameraSpeed;
+            if (EventManager::IsPressed(GLFW_KEY_LEFT_SHIFT))
 				cameraPos += cameraUp * cameraSpeed;
+            if (EventManager::IsPressed(GLFW_KEY_LEFT_CONTROL))
+				cameraPos -= cameraUp * cameraSpeed;
             EventManager::clearMouse();
         }
         glm::mat4x4 getViewMatrix(){
+//        	cout << "getViewMat - Camera.cameraPos["<< hex << this <<"]: " << cameraPos.x << ", " << cameraPos.y << ", " << cameraPos.z << endl;
         	return glm::lookAt(cameraPos, cameraPos+cameraFront, cameraUp);
         }
         void handleCameraDirection(GLFWwindow* window){
-			float xoffset = EventManager::MOUSE.dpos.x;
-			float yoffset = -EventManager::MOUSE.dpos.y;
+        	float xoffset = EventManager::MOUSE.dpos.x;
+        	float yoffset = -EventManager::MOUSE.dpos.y;
 			xoffset *= SENSITIVITY;
 			yoffset *= SENSITIVITY;
-
-			yaw   -= xoffset;
-			pitch -= yoffset;
-
-			if(pitch > 89.0f)
-				pitch = 89.0f;
-			if(pitch < -89.0f)
-				pitch = -89.0f;
+			yaw   += xoffset;
+			pitch += yoffset;
 			updateCameraVectors();
         }
         void handleCameraZoom(GLFWwindow* window){
-			fov += (float)EventManager::MOUSE.scrollY * SENSITIVITY;
-			if (fov < 1.0f) fov = 1.0f;
-			if (fov > 75.0f) fov = 75.0f;
-			std::cout << "CAMERA::FOV = " << fov << std::endl;
+			fov -= (float)EventManager::MOUSE.scrollY * SENSITIVITY;
+			if (fov < minFOV) fov = minFOV;
+			if (fov > maxFOV) fov = maxFOV;
         }
 
-		float getFov() const {
-			return fov;
-		}
+		float getFov() const { return fov; }
+		void setFov(float fov) { this->fov = fov; }
+		float getYaw() const { return yaw; }
+		void setYaw(float yaw) { this->yaw = yaw; }
+		float getPitch() const { return pitch; }
+		void setPitch(float pitch) { this->pitch = pitch; }
+		float getSensitivity() const { return SENSITIVITY; }
+		void setSensitivity(float sensitivity) { SENSITIVITY = sensitivity; }
+		float getSpeed() const { return SPEED; }
+		void setSpeed(float speed) { SPEED = speed; }
+		glm::vec3& getCameraFront() { return cameraFront; }
+		void setCameraFront(const glm::vec3 cameraFront) { this->cameraFront = cameraFront; }
+        void setCameraPos(const glm::vec3 cameraPos) { this->cameraPos = cameraPos; }
+		
+        glm::vec3& getCameraPos() { return cameraPos; }
 
-		void setFov(float fov) {
-			this->fov = fov;
-		}
-
-		float getSensitivity() const {
-			return SENSITIVITY;
-		}
-
-		void setSensitivity(float sensitivity) {
-			SENSITIVITY = sensitivity;
-		}
-
-		float getSpeed() const {
-			return SPEED;
-		}
-
-		void setSpeed(float speed) {
-			SPEED = speed;
-		}
 
     private:
-        float SPEED = 2.5f;
-        float SENSITIVITY = 0.1;
+        string label = "Camera";
+        string ID;
+        float SPEED = 5.5f;
+        float SENSITIVITY = 1;
         float lastX = 1366/2, lastY = 768/2;
         float xpos = 0, ypos = 0;
-        float yaw = 90.0, pitch = 0;
+        float yaw = -90.0, pitch = 0;
         float fov = 75;
         bool firstMouse = true;
-        glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
         void defaultInit(){
+        	ID = uuid::v4();
             cameraPos = glm::vec3(0.0f, 0.0f, -3.0f);
             cameraTarget = glm::vec3(0);
-            cameraFront = glm::vec3(0.0f, 0.0f, 1.0f);
+            cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+            cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
             deltaTime = 0.0f;
             lastFrame = 0.0f;
         }
@@ -125,8 +132,7 @@ class Camera {
 			front.y = glm::sin(glm::radians(pitch));
 			front.z = glm::sin(glm::radians(yaw)) * glm::cos(glm::radians(pitch));
 			cameraFront = glm::normalize(front);
-			// also re-calculate the Right and Up vector
-			cameraRight = glm::normalize(glm::cross(cameraFront, up));  // normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
+			cameraRight = glm::normalize(glm::cross(cameraFront, glm::vec3(0,1,0)));  // normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
 			cameraUp    = glm::normalize(glm::cross(cameraRight, cameraFront));
 		}
         glm::vec3 calcDirection(glm::vec3 pos, glm::vec3 target){
@@ -139,4 +145,5 @@ class Camera {
             return glm::cross(dir, right);
         }
 };
+
 #endif

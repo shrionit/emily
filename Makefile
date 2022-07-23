@@ -12,7 +12,7 @@ CXXFLAGS	:= -std=c++17 -Wextra -g
 # define library paths in addition to /usr/lib
 #   if I wanted to include libraries not in /usr/lib I'd specify
 #   their path using -Lpath, something like:
-LFLAGS = -lglfw3 -lopengl32 -lgdi32 -lglu32 -lassimp.dll
+LFLAGS = -lglfw3 -lopengl32 -lgdi32 -lglu32 -lassimp.dll -lrpcrt4
 
 # define output directory
 OUTPUT	:= output

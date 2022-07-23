@@ -8,13 +8,12 @@
 #ifndef RENDERER_H
 #define RENDERER_H
 
-#include "..\Display\Camera.h"
-#include "..\Display\DisplayManager.h"
-#include "..\Shader\Shader.h"
-#include "..\Utils\GMath.h"
-#include "..\Display\GUI.h"
 #include <vector>
-
+#include "../Display/Camera.h"
+#include "../Display/DisplayManager.h"
+#include "../Utils/GMath.h"
+#include "../Interface/ComponentManager.h"
+#include "../Shader/Shader.h"
 #include "../Entity/Entity.h"
 
 #pragma once
@@ -22,16 +21,16 @@ using namespace EMILY;
 class Renderer {
 	public:
 		Shader shader;
-		Camera camera;
+		Camera* camera;
 		Window window;
 		float fov = 75;
 		float aspect = 16.0/9.0;
 		float zNear = 0.1;
 		float zFar = 1000.0;
-		Renderer(Window& window, Shader& shader, Camera& camera){
-			this->window = window;
-			this->camera = camera;
-			this->shader = shader;
+		Renderer(Window& _window, Shader& _shader, Camera& _camera){
+			window = _window;
+			camera = &_camera;
+			shader = _shader;
 			aspect = (float)window.width/(float)window.height;
 			ComponentManager::Init();
 		}
@@ -47,13 +46,21 @@ class Renderer {
 		}
 		void refresh(){
 			clear();
-			camera.handleMovement(window.window);
+			camera->handleMovement(window.window);
+			fov = camera->getFov();
+		}
+		void render(Scene scene){
+			scene.getSelectedShader()->use();
+			for(auto &e : scene.getEntities()){
+				cout << e.first << endl;
+			}
+			scene.getSelectedShader()->detach();
 		}
 		void render(Entity entity){
 			shader.use();
 			entity.bind();
 			shader.setMat4("projection", GMath::projectionMatrix(fov, aspect, zNear, zFar));
-			shader.setMat4("view", camera.getViewMatrix());
+			shader.setMat4("view", camera->getViewMatrix());
 			entity.render(shader);
 			entity.unBind();
 			shader.detach();
@@ -63,7 +70,7 @@ class Renderer {
 			newshader.use();
 			entity.bind();
 			newshader.setMat4("projection", GMath::projectionMatrix(fov, aspect, zNear, zFar));
-			newshader.setMat4("view", camera.getViewMatrix());
+			newshader.setMat4("view", camera->getViewMatrix());
 			entity.render(newshader);
 			entity.unBind();
 			newshader.detach();
@@ -73,23 +80,23 @@ class Renderer {
 			return aspect;
 		}
 
-		void setAspect(float aspect = 16.0 / 9.0) {
+		void setAspect(float aspect) {
 			this->aspect = aspect;
 		}
 
 		const Camera& getCamera() const {
-			return camera;
+			return *camera;
 		}
 
-		void setCamera(const Camera &camera) {
-			this->camera = camera;
+		void setCamera(Camera& cam) {
+			camera = &cam;
 		}
 
 		float getFov() const {
 			return fov;
 		}
 
-		void setFov(float fov = 75) {
+		void setFov(float fov) {
 			this->fov = fov;
 		}
 

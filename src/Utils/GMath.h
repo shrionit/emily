@@ -11,16 +11,15 @@ class GMath {
     public:
         static glm::mat4x4 transformationMatrix(glm::vec3& pos, glm::vec3& rot, glm::vec3& scale){
             glm::mat4x4 model = glm::mat4x4(1);
-            auto rad = [](float x){return glm::radians(x);};
             model = glm::translate(model, pos);
-            model = glm::rotate(model, rad(rot.x), glm::vec3(1,0,0));
-            model = glm::rotate(model, rad(rot.y), glm::vec3(0,1,0));
-            model = glm::rotate(model, rad(rot.z), glm::vec3(0,0,1));
+            model = glm::rotate(model, glm::radians(rot.x), glm::vec3(1,0,0));
+            model = glm::rotate(model, glm::radians(rot.y), glm::vec3(0,1,0));
+            model = glm::rotate(model, glm::radians(rot.z), glm::vec3(0,0,1));
             model = glm::scale(model, scale);
             return model;
         }
         static glm::mat4x4 projectionMatrix(float& fov, float& aspect, float& zNear, float& zFar){
-            return glm::perspective(fov, aspect, zNear, zFar);
+            return glm::perspective(glm::radians(fov), aspect, zNear, zFar);
         }
         static glm::mat4x4 viewMatrix(Camera& camera){
             return glm::lookAt(camera.cameraPos, camera.cameraPos + camera.cameraFront, camera.cameraUp);

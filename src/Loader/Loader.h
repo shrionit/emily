@@ -1,10 +1,3 @@
-/*
- * Loader.h
- *
- *  Created on: 03-Jun-2022
- *      Author: shripc
- */
-
 #ifndef LOADER_H
 #define LOADER_H
 #include "glad\glad.h"

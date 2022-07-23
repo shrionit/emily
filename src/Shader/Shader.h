@@ -7,27 +7,33 @@
 #include <sstream>
 #include <iostream>
 #include <glm\vec4.hpp>
+#include <glm\vec2.hpp>
+#include <glm\vec3.hpp>
 #include <glm\mat4x4.hpp>
+#include <glm\mat2x2.hpp>
+#include "..\Utils\UUID.h"
 
 #pragma once
 
 class Shader {
     public:
         GLuint ID;
-        Shader(){}
+        Shader():_uid(uuid::v4()){}
         Shader(const char*, const char*);
         void use();
         void detach();
         void setBool(const std::string&, bool) const;
         void setInt(const std::string&, int) const;
         void setFloat(const std::string&, float) const;
-
+        const std::string& getID(){
+        	return _uid;
+        }
         // ------------------------------------------------------------------------
         void setVec2(const std::string &name, const glm::vec2 &value) const {
             glUniform2fv(glGetUniformLocation(ID, name.c_str()), 1, &value[0]); 
         }
         void setVec2(const std::string &name, float x, float y) const {
-            glUniform2f(glGetUniformLocation(ID, name.c_str()), x, y); 
+            glUniform2f(glGetUniformLocation(ID, name.c_str()), x, y);
         }
         // ------------------------------------------------------------------------
         void setVec3(const std::string &name, const glm::vec3 &value) const {
@@ -57,6 +63,7 @@ class Shader {
         }
         ~Shader();
     private:
+        std::string _uid;
         GLuint genShader(const char* source, GLuint shader_type);
         GLuint genShaderProgram(GLuint vs, GLuint fs);
 };

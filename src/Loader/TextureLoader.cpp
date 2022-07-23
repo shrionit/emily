@@ -1,8 +1,6 @@
 #include "TextureLoader.h"
 #include "..\stb.h"
 using namespace EMILY;
-
-const std::string TextureLoader::TEXBASEPATH = "assets/textures/";
 TextureLoader::TextureLoader(){}
 TextureLoader::~TextureLoader(){}
 
@@ -22,7 +20,7 @@ Texture TextureLoader::load(const char* textureFileName, GLuint texN){
     genEmptyTex(texture);
     //load and generate the texture
     int width, height, nrChannels;
-    const char* filePath = (TEXBASEPATH+textureFileName).c_str();
+    const char* filePath = textureFileName;
     std::cout << "FilePath: " << filePath << std::endl;
     unsigned char* data;
     try {

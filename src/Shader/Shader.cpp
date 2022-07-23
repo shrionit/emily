@@ -1,6 +1,7 @@
 #include "Shader.h"
 
 Shader::Shader(const char* vertexPath, const char* fragmentPath) {
+	_uid = uuid::v4();
     std::string vertexCode;
     std::string fragmentCode;
     std::ifstream vShaderFile;
@@ -69,7 +70,7 @@ GLuint Shader::genShader(const char* source, GLuint shader_type){
     if(!success) {
         glGetShaderInfoLog(shader, 512, NULL, infoLog);
         std::cout << "ERROR::SHADER::" << ((shader_type == GL_VERTEX_SHADER) ? "VERTEX": "FRAGMENT") << "::COMPILATION_FAILED\n" << infoLog << std::endl;
-        return NULL;
+        return 0;
     }
     return shader;
 }
@@ -86,7 +87,7 @@ GLuint Shader::genShaderProgram(GLuint vs, GLuint fs){
     if(!success) {
         glGetProgramInfoLog(program, 512, NULL, infoLog);
         std::cout << "ERROR::SHADER::PROGRAM::COMPILATION_FAILED\n" << infoLog << std::endl;
-        return NULL;
+        return 0;
     }
     glDeleteShader(vs);
     glDeleteShader(fs);

@@ -3,6 +3,10 @@
 void __defaultResizeCB(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
 }
+void onClose(GLFWwindow* w){
+    glfwSetWindowShouldClose(w, true);
+}
+
 DisplayManager::DisplayManager() {}
 
 DisplayManager::~DisplayManager() {}
@@ -29,5 +33,7 @@ Window DisplayManager::createWindow(const char* title, int width, int height){
     Window w(window, width, height, title);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
     w.setOnWindowResize(__defaultResizeCB);
+    EventManager::Init(window);
+    w.handleEvent(EventManager::ProcessEvents);
     return w;
 }

@@ -1,30 +1,39 @@
 #include "Entity.h"
 
 namespace EMILY {
-
+	GLuint Entity::count = 0;
 
 	Entity::Entity(const char* modelPath, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale){
+		ID = uuid::v4();
 		this->model = Model(modelPath);
 		this->position = position;
 		this->rotation = rotation;
 		this->scale = scale;
+		this->drawMode = GL_FILL;
 		this->hasModel = true;
+		setLabel();
 	}
 
 	Entity::Entity(VAO& vao, Texture& texture) {
+		ID = uuid::v4();
 		this->vao = vao;
 		this->texture = texture;
 		this->position = glm::vec3(0);
 		this->rotation = glm::vec3(0);
 		this->scale = glm::vec3(1);
+		this->drawMode = GL_FILL;
+		setLabel();
 	}
 
 	Entity::Entity(VAO& vao, Texture& texture, glm::vec3 position, glm::vec3 rotation, glm::vec3 scale){
+		ID = uuid::v4();
 		this->vao = vao;
 		this->texture = texture;
 		this->position = position;
 		this->rotation = rotation;
 		this->scale = scale;
+		this->drawMode = GL_FILL;
+		setLabel();
 	}
 
 	void Entity::bind(){
@@ -39,7 +48,7 @@ namespace EMILY {
 		shader.use();
 		shader.setMat4("model", GMath::transformationMatrix(position, rotation, scale));
 		if(isVisible()){
-			glPolygonMode(GL_POLYGON_MODE, getDrawMode());
+			glPolygonMode(GL_FRONT_AND_BACK, getDrawMode());
 			if(hasModel){
 				model.Draw(shader);
 			}else{
@@ -57,9 +66,9 @@ namespace EMILY {
 		s.use();
 		s.setMat4("model", GMath::transformationMatrix(position, rotation, scale));
 		if(isVisible()){
-			glPolygonMode(GL_POLYGON_MODE, getDrawMode());
+			glPolygonMode(GL_FRONT_AND_BACK, getDrawMode());
 			if(hasModel){
-				model.Draw(s);
+				model.Draw(shader);
 			}else{
 				texture.bind();
 				if(vao.getHasIndices()){
@@ -108,6 +117,7 @@ namespace EMILY {
 	}
 
 	void Entity::setTexture(const Texture &texture) {
+		hasCustomTexture = true;
 		this->texture = texture;
 	}
 
@@ -133,8 +143,8 @@ namespace EMILY {
 		return drawMode;
 	}
 
-	void Entity::setDrawMode(GLuint drawMode) {
-		this->drawMode = drawMode;
+	void Entity::setDrawMode(GLuint dm) {
+		this->drawMode = dm;
 	}
 
 	const Model& Entity::getModel() const {
@@ -143,6 +153,15 @@ namespace EMILY {
 
 	void Entity::setModel(const Model &model) {
 		this->model = model;
+	}
+
+	void Entity::setLabel(std::string newLabel){
+		if(newLabel == ""){
+			label = string("Entity "+to_string(count));
+			count++;
+		}else{
+			label = newLabel;
+		}
 	}
 
 }

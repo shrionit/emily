@@ -17,7 +17,6 @@
 #include "../Loader/TextureLoader.h"
 #include <string>
 #include <vector>
-
 using namespace std;
 using namespace EMILY;
 
@@ -57,6 +56,10 @@ public:
 
         // now that we have all the required data, set the vertex buffers and its attribute pointers.
         setupMesh();
+    }
+
+    void addTexture(Texture& texture){
+        textures.push_back(texture);
     }
 
     // render the mesh
